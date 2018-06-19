@@ -1,0 +1,323 @@
+###################################################################################
+SMART-DAP (SMART - Data Analysis Pipeline)
+
+SMART (Sequencing-based Mutational Analysis of Riboswitch-induced 
+Terminaiton) is a high-throughput method for generating ligand-dependent in vitro 
+transcription termination profiles. The following is a guide for analyzing 
+sequencing data obtained using this assay.
+
+###################################################################################
+Requirements:
+
+===================================================================================
+Python 3.5 (or compatible version)
+Required packages:
+ - ast
+ - numpy
+ - os
+ - pandas
+ - re
+ - sys
+
+I recommend downloading and managing Python with the Anaconda platform 
+(https://www.anaconda.com/download/) if you are new to programming in Python. All
+of the required Python packages should come pre-loaded with Anaconda.
+  
+===================================================================================
+Cutadapt (or analogous -- often required for preparing sequences for alignment)
+
+See http://cutadapt.readthedocs.io/en/stable/installation.html for information on
+installation.
+
+===================================================================================
+Bowtie2 (required for sequence alignment)
+
+See http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml for information on 
+installing Bowtie2.
+
+===================================================================================
+R v3.4.4 (or compatible version - Optional)
+Required packages:
+ - minpack.lm
+
+R is used for fitting termination profiles and can be installed through the 
+Anaconda platform (see https://anaconda.org/r/r-essentials). An alternative to 
+using R is to analyze the data in Prism or another statistics program. The required 
+package minpack.lm can also be downloaded through Anaconda (see
+https://anaconda.org/conda-forge/r-minpack.lm).
+
+===================================================================================
+Graphpad Prism 7 (or compatible version - Optional)
+
+Prism can alternatively be used for fitting termination profiles. Prism is 
+commercially available (see https://www.graphpad.com/scientific-software/prism/). 
+Other programs can be used in its place, but the pipeline is setup for analysis 
+with R or Prism.
+
+===================================================================================
+The scripts: 
+- CreateVariantsList.py
+- CVL_conf.py
+- DeterminePFL.py
+- PrepPFLdata4PRISM.py (Optional)
+- GenerateFits.R (Optional)
+
+All of which are provided herein.
+
+###################################################################################    
+Execution instructions:
+
+Steps 1&2 describe the alignment process. These steps may change some based on
+the specific circumstances of your experiment. Demos are not provided for these
+steps. See documentation written for these programs instead.
+
+===================================================================================
+1. Remove the region upstream of the riboswitch and the 3' adaptor using cutadapt
+(or analogous program).
+
+There should be an adaptor that you ligated onto the 3' end of your RNA to perform
+reverse transcription. Removing this region will make aligning using bowtie more 
+accurate. Additionally, there should be an unmodified region upstream of section 
+of the RNA that was intentionally mutated (the region containing your primer if 
+PCR was used at any stage). Checking for this region (and removing it if desired) 
+ensures that you are working with a full-length RNA and that something strange did 
+not happen during sample prep. To remove these regions you can use cutadapt (or an 
+analogous program). 
+
+Example script (using paired-end input files):
+
+cutadapt -q 5 -m 80 -O 10 -g <forward adaptor> -G <reverse adaptor> -o <read1 
+output filename> -p <read2 output filename> --discard-untrimmed --pair-filter=any 
+<read1 input filename> <read1 input filename>
+
+-q = quality score cutoff
+-m = minimum length of the sequence before removing cutadapt
+-O = min overlap cutoff (adaptor overlap)
+--discard-untrimmed = removes sequences where no adaptor is found
+--pair-filter=any = causes sequences to be removed if one or both of the
+                    adaptors are missing (when used with --discard-untrimmed)
+
+***
+NOTE: Including flags for quality score cutoff, minimum adaptor length, etc is not
+required. However, it can help reduce incorrect sequences from being identified as 
+containing adaptors.
+***
+
+File types:
+Input & output files should be in FASTQ format
+
+Cutadapt documentation can be found here: 
+https://cutadapt.readthedocs.io/en/stable/guide.html
+
+===================================================================================
+2. Align trimmed sequences to reference sequence with bowtie2.
+
+We need to know how well each sequence matches the wild type RNA, where there are 
+mismatches, indels, and where the site of termination is. An easy way to quickly 
+obtain this information using an alignment program such as bowtie2.
+
+Example script (using paired-end input files):
+bowtie2 -p <number of processors> --no-discordant --no-mixed -x <reference sequence
+file>  -1 <trimmed read1 input file> -2 <trimmed read2 input file> > <output file>
+
+File types:
+- Input files should be in FASTQ format (files from step 1 with adaptors removed)
+- Reference sequence file should be in fasta format (must contain the sequence of
+  the RNA of interest)
+- Output file needs to be in SAM format
+
+Bowtie2 documentation can be found here: 
+http://bowtie-bio.sourceforge.net/bowtie2/manual.shtml
+
+***
+NOTE: The input files for later steps MUST contain the ligand concentration in the 
+filename (I should change this at some point, but for now this is true). 
+Including the ligand concentration in the name of the output SAM file created here 
+will make your filenames consistent and save you from having to rename your files 
+later. 
+
+Concentrations included in the name need to be of the form:
+[numbers -- without periods/commas/etc] + [m,u,n,p,f] + M
+
+For example: 
+- 1M
+- 50mM
+- 200uM
+- 30nM
+etc.
+***
+
+===================================================================================
+3. Use CreateVariantsList.py to create a list of all variants and their start & 
+stop positions.
+
+Analyzing the SAM files can be a fairly computationally expensive process. What we 
+really care about is the number and types of mutations observed in each sequence
+as well as the start and stop position. CreateVariantsList.py distills the 
+information provided in the SAM file to exactly this and removes ambiguous 
+sequences (sequences with nucleotides that have low quality scores for >1 
+position).
+
+CreateVariantsList.py requires a config file to be in the same directory 
+(CVL_conf.py). Only three options in the config file should be altered (the rest 
+are vestigial from another script and just haven't been removed yet):
+
+- minMAPQ (MAPQ threshold to include a SAM line; default = 20)
+- qualityScoreThreshold (Minimum quality score allowed for a given base; 
+  default = 20)
+- mutRange = (mutation Range; for  the C. tetani (default): first mutation is at 
+  25 and the last is at 198)
+
+mutRange will need to be altered based on the specific range where mutations are 
+expected. This range is numbered according to the reference sequence (or reference
+"genome") used.
+
+Usage for CreateVariantsList.py:
+python CreateVariantsList.py <SAM input file> <reference sequence file>
+
+Example (how to run the demo file):
+python CreateVariantsList.py Cte_100mM_Gly-demo.sam Cte_ref.fa
+
+File types:
+- Input files must be in SAM format (use the file(s) created in the last step)
+- Reference sequence file should be in FASTA format (use the same one that you 
+  used in step 2)
+- Output file will be a TXT file
+  
+***
+NOTE: A folder titled 'output' will need to be created in the same directory as 
+this script. Also, the output file will be a TXT file with the same name as the SAM
+input file, but with "_variants.txt" replacing the ".sam".
+***
+
+===================================================================================
+4. Use DeterminePFL.py to determine the percentage of full-length sequences at each
+concentration for each variant.
+
+DeterminePFL.py takes the list of text files created with CreateVariantsList.py 
+(one for each ligand concentration tested) and creates multiple output files. In 
+one, it counts the number of full-length and truncated sequences for all variants 
+in each file to determine the percentage that are full-length. For each of these 
+input files, it also keeps track of the sites of termination and creates a csv 
+outfile with the number of times termination was observed following each 
+nucleotide. 
+
+Input and output filenames currently need to be hardcoded into this script. The 
+number of mutations to be considered can also be changed in the same section. 
+These variables can be found in a section labeled "Variables to edit".
+
+Usage (default setting is to analyze the demo file):
+python DeterminePFL.py
+
+File types:
+- Input files should be the TXT file created with CreateVariantsList.py
+- Output files are CSV format
+
+***
+NOTE: The input files for DeterminePFL.py MUST contain the ligand concentration in 
+the filename. If two of the files have the same ligand concentration (perhaps 
+because two an alternate ligand was tested) they will need to be run in seperate
+batches. I should change this at some point, but this is how the script is currently 
+coded.
+
+Concentrations included in the filename need to be of the form:
+[numbers -- without periods/commas/etc] + [m,u,n,p,f] + M
+
+Examples: 
+- 1M
+- 50mM
+- 200uM
+- 30nM
+etc.
+***
+
+===================================================================================
+5.1 Fit the data to a modified binding equation using GenerateFits.R (Option 1)
+
+There are two options for fitting the data to the modified binding equation. The 
+first is to use the R script provided (GenerateFits.R). This is probably the most
+straightforward option. As before, the names of the input and output files need to
+be hardcoded into the script manually. The variables that need to be edited can be 
+found in a section labeled "Variables to edit".
+
+Usage (default setting is to analyze the demo file):
+R --slave < GenerateFits.R
+
+--slave = makes R run 'quietly'
+
+File types:
+- The input file should be the CSV file created with DeterminePFL.py
+- The output file should be a CSV file
+
+***
+NOTE: Heat maps can be made using HeatMapMaker.py (separate script).
+***
+
+===================================================================================
+5.2 Fit the data to a modified binding equation using Graphpad Prism 7 (Option 2)
+
+The second option for generating fits is to use a graphical statistics software
+like Prism. The data from the CSV file created using DeterminePFL.py can be 
+prepared for analysis by Prism using the script PrepPFLdata4PRISM.py. I should note
+that Prism can only analyze 256 datasets per sheet. So this option is only useful
+for analyzing single mutations and typically shouldn't be used for looking at double 
+mutants (your computer will may freeze up if you try to run PrepPFLdata4PRISM.py 
+with more than 500-1000 variants).
+
+As before, the names of the input and output files need to be hardcoded into the 
+script manually and the variables that need to be edited can be found in the 
+section labeled "Variables to edit".
+
+Usage (default setting is to analyze the demo file):
+python PrepPFLdata4PRISM.py
+
+File types:
+- The input file should be the CSV file created with DeterminePFL.py
+- The output file will be an XLSX file (excel format)
+
+This output file can then be used to import the data directly into Prism. These 
+date should be fit to the following equation:
+
+Y = (Ymax-Ymin)*X/(K+X)+Ymin
+where: 
+- Ymin is the minimum amount of full-length RNA produced (and the y-intercept)
+- Ymax is the maximum amount of full-length RNA produced
+- K is the point of half-maximal termination
+- X is the ligand concentration
+
+or
+
+Y = Amp*X/(K+X)+Ymin
+where:
+Amp is the amplitude
+
+***
+NOTE: The percent of full-length RNA observed and the standard deviation (SD) is 
+reported for each condition. I recommend weighting the data by 1/SD^2 as the values 
+for some data points may be better defined than for others. Inverse variance 
+weighting will account for this and provide more accurate fits.
+
+Also, heat maps can be made using HeatMapMaker.py (separate script).
+***
+
+###################################################################################    
+Authors:
+
+- Chad Torgerson - Initial work (2018)
+
+###################################################################################    
+License:
+
+This project is licensed under the GNU General Public License - see the COPYING 
+file for details.
+
+###################################################################################    
+Acknowledgements:
+
+Thanks to Michael Rutenberg-Shoenberg and Peter Wang for helpful discussions in 
+developing aspects of this pipeline.
+
+The CreateVariantsList.py script and its associated config file were adapted from 
+the RTEventsCounter.py script (DOI: 10.1021/acs.biochem.7b00323) by the Simon Lab 
+at Yale. Their code was initially based on the ShapeMapper program by the Weeks Lab 
+at UNC Chapel Hill (DOI: 10.1038/nmeth.3029).

@@ -1,0 +1,127 @@
+###################################################################################
+SMART - Heat Map Maker
+
+SMART stands for Sequencing-based Mutational Analysis of Riboswitch-induced 
+Termination. SMART is a high-throughput method for generating ligand-dependent in 
+vitro transcription termination profiles. The following is a guide for creating
+heat maps of the fit parameters generated using SMART-DAP (SMART - Data Analysis 
+Pipeline).
+
+###################################################################################
+Requirements:
+
+===================================================================================
+Python 3.5 (or compatible version)
+Required packages:
+ - functools
+ - math
+ - numpy
+ - operator
+ - os
+ - pandas
+ - re
+ - bs4
+ 
+I recommend downloading and managing Python with the Anaconda platform 
+(https://www.anaconda.com/download/) if you are new to programming in Python. All
+of the required Python packages should come pre-loaded with Anaconda, except bs4,
+which can be downloaded separately through Anaconda (see 
+https://anaconda.org/anaconda/beautifulsoup4).
+  
+===================================================================================
+Inkscape version 0.48 (or compatible version)
+
+Inkscape can be downloaded at https://inkscape.org/da/download/.
+
+===================================================================================
+The script HeatMapMaker.py (provided herein).
+
+===================================================================================
+A csv file containing fits generated with Graphpad Prism 7 through SMART-DAP.
+
+###################################################################################    
+Execution instructions:
+
+Creating heat maps with this script is a bit of an involved process. The main idea
+for creating these heatmaps is to create an uncolored figure in Inkscape and 
+manually label the regions that are to be colored. The HeatMapMaker.py script can 
+then be used to color those objects according to the parameter values obtained 
+through the fits generated with either PRISM or R using SMART-DAP.
+
+===================================================================================
+1. Manually create the RNA secondary structure in Inkscape.
+
+This step should be fairly self-explanatory. It is important to note that the 
+script modifies the fill color of labeled objects (see next step). In the example
+provided, I change the fill color of the circles surrounding each nucleotide 
+letter.
+
+===================================================================================
+2. Manually label the objects to be colored in Inkscape.
+
+The 'object id' of each object that needs to be colored must be labeled according 
+to its identity. For example, if the nucleotide object is associated with A15U/C/G, 
+its 'object id' needs to be labeled as A15. This needs to be done for all objects 
+associated with a nucleotide position in the fits generated with PRISM or R using 
+SMART-DAP.
+
+Object id's can be changed by selecting the object and clicking 'Object properties' 
+under the 'Objects' tab or by typing 'Ctr + shift + o' after selecting the object.
+
+***
+NOTE: When labeling objects, uppercase RNA letters (ie. use 'U' and not 'T') must 
+be used.
+
+Correct:
+- A15
+- U25
+- G32
+
+Incorrect:
+- a15
+- T25 or t25
+- g32
+***
+
+===================================================================================
+3. Use the HeatMapMaker.py script to create colored heat maps.
+
+HeatMapMaker.py takes the SVG file created with Inkscape and modifies the fill 
+color of relabeled objects based on the parameter values obtained through the fits 
+generated with either PRISM or R using SMART-DAP. HeatMapMaker.py determines the 
+mean value of the values associated with a labeled position and determines the 
+new color by linear interpolation.
+
+Input and output filenames, as well as several other parameters, need to be 
+hardcoded into this script. These parameters are annotated in the script and 
+hopefully are fairly intuitive. They can be found in the section labeled 
+"Variables to edit". One of the most important of these is 'parameter_type'. 
+This determine which parameter (Ymin, Ymax, K, or Amp) is used when determining 
+the fill color.
+
+Usage (default setting is to analyze the demo file):
+python HeatMapMaker.py
+
+File types:
+- An annotated SVG file containing the RNA secondary structure (see steps 1&2) and 
+  a CSV file containing the fit parameters generated with SMART-DAP are required 
+  as input files.
+- An SVG file is created as the output
+
+
+###################################################################################    
+Authors:
+
+- Chad Torgerson - Initial work (2018)
+
+###################################################################################    
+License:
+
+This project is licensed under the GNU General Public License - see the COPYING 
+file for details.
+
+###################################################################################    
+Acknowledgements:
+
+Some of the code used in HeatMapMaker_PRISM.py was adapted from a script by Jamie 
+Bull (see http://oco-carbon.com/metrics/heat-maps-with-python-and-inkscape/).
