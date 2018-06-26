@@ -229,7 +229,27 @@ try:
         df=pd.read_csv(csvFile, sep=',', encoding = "ISO-8859-1", skipinitialspace=True, header=0, index_col = 0)
         df2=pd.DataFrame(df.values[:,0::2], columns=df.columns[0::2], index=df.index).apply(pd.to_numeric).T
     
-    
+    if Ymax == None:
+        # Add row -- Maximum % FL (Ymax)
+        Ymax = 'Ymax'
+        Ymaxs = np.array(df2.loc[Ymin]) + np.array(df2.loc[Amplitude])
+        Ymaxs = pd.DataFrame(Ymaxs).T
+        Ymaxs.columns = df2.columns.values #
+        df2.loc[Ymax,:] = Ymaxs.loc[0,:]
+    elif Amplitude == None:
+        # Add row -- Amplitude (Amp)
+        Amplitude = 'Amp'
+        Amps = np.array(df2.loc[Ymax]) - np.array(df2.loc[Ymin])
+        Amps = pd.DataFrame(Amps).T
+        Amps.columns = df2.columns.values #
+        df2.loc[Amplitude,:] = Amps.loc[0,:]
+    elif Ymin == None:
+        # Add row -- Amplitude (Amp)
+        Ymin = 'Ymin'
+        Ymins = np.array(df2.loc[Ymax]) - np.array(df2.loc[Amplitude])
+        Ymins = pd.DataFrame(Ymins).T
+        Ymins.columns = df2.columns.values #
+        df2.loc[Ymin,:] = Ymins.loc[0,:]
 
     # Add row -- Changes in apparent binding energy (ddG)
     FoldChanges = np.array(df2.loc[K])/np.array(df2['WT'][K])
@@ -332,13 +352,14 @@ try:
                         mutant_base = 'T' + mutSearch.group(2)
                     else:
                         mutant_base = mutSearch.group(1) + mutSearch.group(2)
+                elif fits_generated_with == 'PRISM':
+                        mutant_base = mutSearch.group(1) + mutSearch.group(2)
                 
                 # Create a list containing all 3 sample values
                 for nt in NUCS:
                     mutant_Val = ''
                     if mutSearch.group(1) != nt:
                         mutant = mutant_base + nt
-                        
                         try:
                             if parameter_type == 'Amp':
                                 mutant_Val = df2[mutant][Amplitude]
