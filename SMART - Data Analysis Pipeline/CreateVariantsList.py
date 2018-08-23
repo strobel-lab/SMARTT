@@ -390,11 +390,11 @@ try:
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     # If debugging, set to True and file inputs will be ignored
-    IgnoreFileInputs = False
+    IgnoreFileInputs = True
     
     # These must be set if IgnoreFileInputs is set to True
     # Files and input data
-    if IgnoreFileInputs == True:
+    if IgnoreFileInputs == False:
         demoDirectory = "demos"
         samFilePath = os.path.join(demoDirectory, "Cte_100mM_Gly-demo.sam")
         refFilePath = os.path.join(demoDirectory, "Cte_ref.fa")
@@ -433,7 +433,8 @@ try:
         # Prepare output                
         header_variants = "\t".join([
             "variant",
-            "(start, stop)" + "\n"
+            "(start, stop)",
+            "QNAME"+ "\n"
             ])
  
         # Determine behavior if output file2 already exists
@@ -507,7 +508,7 @@ try:
         prevRawRead = ""
         # Control booleans
         pairFound = False
-        updateCounts = False
+        updateCounts = False        
 
         
         # Print sample name for summary
@@ -603,9 +604,9 @@ try:
                                     
                                     fileOut_variants.write("\t".join([
                                         str(seqNameToCount),
-                                        str(firstLast) + "\n"
+                                        str(firstLast),
+                                        str(clusterName)+ "\n"
                                         ]))
-
         
                                 else:
                                     print('Warning: Negative number of mutations observed')
