@@ -10,14 +10,14 @@
 ###################################################################################
 # GPL statement:
 #
-# This file is part of SMART-DAP (SMART - Data Analysis Pipeline).
+# This file is part of SMARTT-DAP (SMARTT - Data Analysis Pipeline).
 # 
-# SMART-DAP is free software: you can redistribute it and/or modify
+# SMARTT-DAP is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# SMART-DAP is distributed in the hope that it will be useful,
+# SMARTT-DAP is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -60,8 +60,10 @@ try:
     folder = 'demos'
     outputDirectory = 'output'
     variantFileList = (['Cte_100mM_Gly-demo_variants.txt'])
+    #variantFileList = (['Cte_100mM_Gly_variants_withNNNNNs_demo.txt'])
     
-    sampleName = "Cte-demo" # This is used to determine the filenames used for keeping track of the sites of termination and the overall percentage of full-length RNA
+    #sampleName = "Cte-demo" # This is used to determine the filenames used for keeping track of the sites of termination and the overall percentage of full-length RNA
+    sampleName = "Cte_TTS25_QST20"
     outputFileName = os.path.join(outputDirectory, sampleName + "_PFL.csv")
     
     # If file names don't contain the sample concentration, 
@@ -78,30 +80,54 @@ try:
     length = 248 # Last possible nt of riboswitch
     
     # Maximum number of mutations to consider
-    mutationsAllowed = 2
+    mutationsAllowed = 1
+    
+    # If set to true, files will be output reporting the NNNNN values by variant type
+    ReportNNNNNs = False
     
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    
     
     
     # Define pattern for what a concentration looks like
     concentrationRegRE = re.compile(r"([0-9]+)[^a-zA-Z]??([m|u|n|p|f]??M)")
-
+    
+    #%%    
     # Initializing variables
     variantSet = set() # Defining an empty set that will keep track of all variant names    
     ReadsPFL_Dict = {} # Prepare Data Dict
     headers = ['variant'] # Assign first header variable as 'variant'
     conc_list = ['Conc.'] # The second line of the file will keep track of the sample concentration values
     LastntHeaders = ['variant'] # Assign first header variable as 'variant' (for sep. file that keeps track of the last positions)
-        
+    NNNNN_valsList = []
+    NNNNN_indexDict = {}
+    Ns_counter = 0
+    NUCS = ["A", "C", "G", "T"]
     
     positionNums = list(range(-offset,length+1-offset))
     positionNums.remove(0)
     LastntHeaders.extend(positionNums)
     
-
+    
+    if ReportNNNNNs == True:
+        for n1 in NUCS:
+            for n2 in NUCS:
+                for n3 in NUCS:
+                    for n4 in NUCS:
+                        for n5 in NUCS:
+                            NNNNN = n1 + n2 + n3 + n4 + n5
+                            NNNNN_valsList.append(NNNNN)
+                            NNNNN_indexDict[NNNNN] = Ns_counter
+                            Ns_counter += 1
+    NNNNN_valsList.append('XXXXX')
+    NNNNN_indexDict['XXXXX'] = Ns_counter
+    
+    # Assign first header variable as 'variant' (for sep. files that keeps track of the NNNNN values)
+    NNNNN_Headers = ['variant'] + NNNNN_valsList
+    
+    
+    #%%
     # This is where my loop for iterating through all files starts
     for file in variantFileList:
         sumReadsParsed = 0
@@ -113,6 +139,9 @@ try:
         twoMutations = 0
         threeplusMutations = 0
         LastntDict = {}
+        NNNNN_Tnc_Dict = {}
+        NNNNN_FL_Dict = {}
+        NNNNN_Combined_Dict = {}
         
         
         # Make a list of all the sample concentrations
@@ -140,6 +169,10 @@ try:
         
         # Setup Truncation Counts Output File
         lastnt_outputFileName = os.path.join(outputDirectory, sampleName + "_" + sampleConc + "_LastntCounts.csv")
+        if ReportNNNNNs == True:
+            NNNNN_Tnc_outputFileName = os.path.join(outputDirectory, sampleName + "_" + sampleConc + "_NNNNN-Tnc.csv")
+            NNNNN_FL_outputFileName = os.path.join(outputDirectory, sampleName + "_" + sampleConc + "_NNNNN-FL.csv")
+            NNNNN_Combined_outputFileName = os.path.join(outputDirectory, sampleName + "_" + sampleConc + "_NNNNN-Combined.csv")
         
         # Determine behavior if output file already exists/open the outfile
         if os.path.isfile(lastnt_outputFileName):
@@ -149,6 +182,17 @@ try:
         else:
             Lastnt_fileOut = open(lastnt_outputFileName, "w")
             Lastnt_fileOut.write(",".join(str(val) for val in LastntHeaders) + '\n')
+            
+        
+        if ReportNNNNNs == True:
+            NNNNN_Tnc_fileOut = open(NNNNN_Tnc_outputFileName, "w")
+            NNNNN_Tnc_fileOut.write(",".join(str(val) for val in NNNNN_Headers) + '\n')
+            
+            NNNNN_FL_fileOut = open(NNNNN_FL_outputFileName, "w")
+            NNNNN_FL_fileOut.write(",".join(str(val) for val in NNNNN_Headers) + '\n')
+            
+            NNNNN_Combined_fileOut = open(NNNNN_Combined_outputFileName, "w")
+            NNNNN_Combined_fileOut.write(",".join(str(val) for val in NNNNN_Headers) + '\n')
         
         
         # Setup main dictionary for the current file
@@ -181,10 +225,16 @@ try:
                     continue
                 
                 parsedLine = line.split('\t')
-                parsedLine = [ast.literal_eval(i) for i in parsedLine]            
-        
-                firstLast = parsedLine[1]
-                varName = parsedLine[0]
+                #parsedLine = [ast.literal_eval(i) for i in parsedLine]            
+                
+                varName = ast.literal_eval(parsedLine[0])
+                firstLast = ast.literal_eval(parsedLine[1])
+                QNAME = parsedLine[2]
+                if ReportNNNNNs == True:
+                    NNNNN_val = parsedLine[3][:-1]
+                    if 'N' in NNNNN_val:
+                        NNNNN_val = 'XXXXX'
+                
                 lastntIndex = firstLast[1]-1 # making an index for use in the terminationDict (which is why 1 is being subtracted)
                 
                 sumReadsParsed += 1
@@ -214,6 +264,7 @@ try:
                         except:
                             LastntDict[varName] = [0]*length
                             LastntDict[varName][lastntIndex] += 1
+                            
                                 
                         # Last nt is past the designated spot for FL reads            
                         if firstLast[1] >= FL:
@@ -222,7 +273,21 @@ try:
                             except:
                                 FL_Dict[varName] = 1
                                 trunc_Dict[varName] = 0
-                                early_Dict[varName] = 0                            
+                                early_Dict[varName] = 0   
+                            
+                            if ReportNNNNNs == True:
+                            # Keep track of NNNNN values for all 'full-length' RNAs
+                                try:
+                                    NNNNN_Combined_Dict[varName][NNNNN_indexDict[NNNNN_val]] += 1
+                                    NNNNN_FL_Dict[varName][NNNNN_indexDict[NNNNN_val]] += 1
+                                except:
+                                    NNNNN_Combined_Dict[varName] = [0]*(Ns_counter+1)
+                                    NNNNN_FL_Dict[varName] = [0]*(Ns_counter+1)
+                                    NNNNN_Tnc_Dict[varName] = [0]*(Ns_counter+1)
+                                    
+                                    NNNNN_Combined_Dict[varName][NNNNN_indexDict[NNNNN_val]] += 1
+                                    NNNNN_FL_Dict[varName][NNNNN_indexDict[NNNNN_val]] += 1
+                                
                         # Last nt is between designated spots for Truncated and FL reads
                         elif firstLast[1] >= trunc:
                             try:
@@ -231,6 +296,20 @@ try:
                                 FL_Dict[varName] = 0
                                 trunc_Dict[varName] = 1
                                 early_Dict[varName] = 0
+                            
+                            # Keep track of NNNNN values for all 'truncated' RNAs
+                            if ReportNNNNNs == True:
+                                try:
+                                    NNNNN_Combined_Dict[varName][NNNNN_indexDict[NNNNN_val]] += 1
+                                    NNNNN_Tnc_Dict[varName][NNNNN_indexDict[NNNNN_val]] += 1
+                                except:
+                                    NNNNN_Combined_Dict[varName] = [0]*(Ns_counter+1)
+                                    NNNNN_FL_Dict[varName] = [0]*(Ns_counter+1)
+                                    NNNNN_Tnc_Dict[varName] = [0]*(Ns_counter+1)
+                                    
+                                    NNNNN_Combined_Dict[varName][NNNNN_indexDict[NNNNN_val]] += 1
+                                    NNNNN_Tnc_Dict[varName][NNNNN_indexDict[NNNNN_val]] += 1
+                                
                         # Last nucleotide comes before the termination site
                         # these reads are discarded because it is ambiguous if they should be classifed as FL or truncated
                         else:
@@ -310,8 +389,42 @@ try:
             # When a given variant showed up elsewhere, but not for this particular concentration
             except:
                 line.extend([0]*length)
-            Lastnt_fileOut.write(",".join(str(val) for val in line) + '\n') 
+            Lastnt_fileOut.write(",".join(str(val) for val in line) + '\n')
+            
+            if ReportNNNNNs == True:
+                line_Ns_Tnc = [variantName]
+                line_Ns_FL = [variantName]
+                line_Ns_Combined = [variantName]
+                
+                # Add NNNNN values (Tnc)
+                try:
+                    line_Ns_Tnc.extend(NNNNN_Tnc_Dict[variant])
+                # When a given variant showed up elsewhere, but not for this particular concentration
+                except:
+                    line_Ns_Tnc.extend([0]*(Ns_counter+1))
+                NNNNN_Tnc_fileOut.write(",".join(str(val) for val in line_Ns_Tnc) + '\n')
+                
+                # Add NNNNN values (FL)
+                try:
+                    line_Ns_FL.extend(NNNNN_FL_Dict[variant])
+                # When a given variant showed up elsewhere, but not for this particular concentration
+                except:
+                    line_Ns_FL.extend([0]*(Ns_counter+1))
+                NNNNN_FL_fileOut.write(",".join(str(val) for val in line_Ns_FL) + '\n')
+                
+                # Add NNNNN values (Combined)
+                try:
+                    line_Ns_Combined.extend(NNNNN_Combined_Dict[variant])
+                # When a given variant showed up elsewhere, but not for this particular concentration
+                except:
+                    line_Ns_Combined.extend([0]*(Ns_counter+1))
+                NNNNN_Combined_fileOut.write(",".join(str(val) for val in line_Ns_Combined) + '\n')
+            
         Lastnt_fileOut.close()
+        if ReportNNNNNs == True:
+            NNNNN_Tnc_fileOut.close()
+            NNNNN_FL_fileOut.close()
+            NNNNN_Combined_fileOut.close()
         
         
         print("Summary for file:", str(file))

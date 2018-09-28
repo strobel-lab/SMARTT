@@ -1,10 +1,10 @@
 ###################################################################################
-SMART - Heat Map Maker
+SMARTT - Heat Map Maker
 
-SMART stands for Sequencing-based Mutational Analysis of Riboswitch-induced 
-Termination. SMART is a high-throughput method for generating ligand-dependent in 
+SMARTT stands for Sequencing-based Mutational Analysis of RNA Transcription  
+Termination. SMARTT is a high-throughput method for generating ligand-dependent in 
 vitro transcription termination profiles. The following is a guide for creating
-heat maps of the fit parameters generated using SMART-DAP (SMART - Data Analysis 
+heat maps of the fit parameters generated using SMARTT-DAP (SMARTT - Data Analysis 
 Pipeline).
 
 ###################################################################################
@@ -37,7 +37,7 @@ Inkscape can be downloaded at https://inkscape.org/da/download/.
 The script HeatMapMaker.py (provided herein).
 
 ===================================================================================
-A csv file containing fits generated with Graphpad Prism 7 through SMART-DAP.
+A csv file containing fits generated with Graphpad Prism 7 through SMARTT-DAP.
 
 ###################################################################################    
 Execution instructions:
@@ -46,7 +46,7 @@ Creating heat maps with this script is a bit of an involved process. The main id
 for creating these heatmaps is to create an uncolored figure in Inkscape and 
 manually label the regions that are to be colored. The HeatMapMaker.py script can 
 then be used to color those objects according to the parameter values obtained 
-through the fits generated with either PRISM or R using SMART-DAP.
+through the fits generated with either PRISM or R using SMARTT-DAP.
 
 ===================================================================================
 1. Manually create the RNA secondary structure in Inkscape.
@@ -63,7 +63,7 @@ The 'object id' of each object that needs to be colored must be labeled accordin
 to its identity. For example, if the nucleotide object is associated with A15U/C/G, 
 its 'object id' needs to be labeled as A15. This needs to be done for all objects 
 associated with a nucleotide position in the fits generated with PRISM or R using 
-SMART-DAP.
+SMARTT-DAP.
 
 Object id's can be changed by selecting the object and clicking 'Object properties' 
 under the 'Objects' tab or by typing 'Ctr + shift + o' after selecting the object.
@@ -88,7 +88,7 @@ Incorrect:
 
 HeatMapMaker.py takes the SVG file created with Inkscape and modifies the fill 
 color of relabeled objects based on the parameter values obtained through the fits 
-generated with either PRISM or R using SMART-DAP. HeatMapMaker.py determines the 
+generated with either PRISM or R using SMARTT-DAP. HeatMapMaker.py determines the 
 mean value of the values associated with a labeled position and determines the 
 new color by linear interpolation.
 
@@ -104,7 +104,7 @@ python HeatMapMaker.py
 
 File types:
 - An annotated SVG file containing the RNA secondary structure (see steps 1&2) and 
-  a CSV file containing the fit parameters generated with SMART-DAP are required 
+  a CSV file containing the fit parameters generated with SMARTT-DAP are required 
   as input files.
 - An SVG file is created as the output
 

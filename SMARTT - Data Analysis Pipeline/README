@@ -1,10 +1,10 @@
 ###################################################################################
-SMART-DAP (SMART - Data Analysis Pipeline)
+SMARTT-DAP (SMARTT - Data Analysis Pipeline)
 
-SMART (Sequencing-based Mutational Analysis of Riboswitch-induced 
-Terminaiton) is a high-throughput method for generating ligand-dependent in vitro 
-transcription termination profiles. The following is a guide for analyzing 
-sequencing data obtained using this assay.
+SMARTT (Sequencing-based Mutational Analysis of RNA Transcription Termination) is a 
+high-throughput method for generating ligand-dependent in vitro transcription 
+termination profiles. The following is a guide for analyzing sequencing data 
+obtained using this assay.
 
 ###################################################################################
 Requirements:

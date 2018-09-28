@@ -6,9 +6,9 @@ Created on Wed Aug 22 15:31:58 2018
 """
 
 
-# Python script for analyzing the output from Add_NNNNN_Vals2VariantList.py to create a csv 
-# file with the number of reads and the percent of full length RNA produced by a 
-# library of mutant RNA (Step 2 in the Pipeline)
+# Python script for analyzing the output from Add_NNNNN_Vals2VariantList.py to 
+# create a csv file with the number of reads and the percent of full length RNA 
+# produced by a library of mutant RNA (Step 2 in the Pipeline)
 #
 # - Requires Python 3 (has been tested with version 3.5)
 # - Public release 1.0
@@ -17,14 +17,14 @@ Created on Wed Aug 22 15:31:58 2018
 ###################################################################################
 # GPL statement:
 #
-# This file is part of SMART-DAP (SMART - Data Analysis Pipeline).
+# This file is part of SMARTT-DAP (SMARTT - Data Analysis Pipeline).
 # 
-# SMART-DAP is free software: you can redistribute it and/or modify
+# SMARTT-DAP is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# SMART-DAP is distributed in the hope that it will be useful,
+# SMARTT-DAP is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.

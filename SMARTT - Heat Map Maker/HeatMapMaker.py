@@ -1,6 +1,6 @@
 
 # Python script for creating heat maps based on the analysis performed using
-# SMART-DAP (SMART - Data Analysis Pipeline)
+# SMARTT-DAP (SMARTT - Data Analysis Pipeline)
 #
 # - Requires Python 3 (has been tested with version 3.5)
 # - Public release 1.0
@@ -9,14 +9,14 @@
 ###################################################################################
 # GPL statement:
 #
-# This file is part of SMART - Heat Map Maker.
+# This file is part of SMARTT - Heat Map Maker.
 # 
-# SMART - Heat Map Maker is free software: you can redistribute it  
+# SMARTT - Heat Map Maker is free software: you can redistribute it  
 # and/or modify it under the terms of the GNU General Public License 
 # as published by the Free Software Foundation, either version 3 of 
 # the License, or (at your option) any later version.
 #
-# SMART - Heat Map Maker is distributed in the hope that it will be 
+# SMARTT - Heat Map Maker is distributed in the hope that it will be 
 # useful, but WITHOUT ANY WARRANTY; without even the implied warranty 
 # of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
