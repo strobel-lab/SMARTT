@@ -394,7 +394,7 @@ try:
     
     # These must be set if IgnoreFileInputs is set to True
     # Files and input data
-    if IgnoreFileInputs == False:
+    if IgnoreFileInputs == True:
         demoDirectory = "demos"
         samFilePath = os.path.join(demoDirectory, "Cte_100mM_Gly-demo.sam")
         refFilePath = os.path.join(demoDirectory, "Cte_ref.fa")
