@@ -276,7 +276,7 @@ try:
     # Parse xml with BeautifulSoup
     svg = open(svgFile, 'r').read()
     soup = BeautifulSoup(svg, features = 'xml')
-    paths = soup.findAll('path')
+    paths = soup.findAll(['path', 'circle']) #In the updated Inkscape, circle elements are no longer labeled as path
     rects = soup.findAll('rect')
     texts = soup.findAll('text')
     
@@ -336,6 +336,8 @@ try:
     for p in paths:
         SampleValList = []
         if ('path'in p['id']): # these are not named objects (ie. they are not associated w/ a nt position)
+            continue
+        elif('circle' in p['id']): # also named objects (ie. they are not associated w/ a nt position)
             continue
         elif('-' in p['id']): # also named objects (ie. they are not associated w/ a nt position)
             continue

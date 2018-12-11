@@ -1,1 +1,6 @@
 */output/*
+SMARTT - Heat Map Maker/HeatMapMaker_Bsu.py
+SMARTT - Heat Map Maker/demos/BsuR1-WT_AllSingleMutations_R.csv
+SMARTT - Heat Map Maker/demos/Bsu_Fits_AllSingleMutations_PRISM.csv
+SMARTT - Heat Map Maker/demos/Bsu_annotated.svg
+.gitignore

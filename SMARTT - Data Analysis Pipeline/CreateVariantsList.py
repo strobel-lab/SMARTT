@@ -390,7 +390,7 @@ try:
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     # If debugging, set to True and file inputs will be ignored
-    IgnoreFileInputs = True
+    IgnoreFileInputs = False
     
     # These must be set if IgnoreFileInputs is set to True
     # Files and input data
