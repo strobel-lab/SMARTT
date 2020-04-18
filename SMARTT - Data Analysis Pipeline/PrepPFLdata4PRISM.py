@@ -1,10 +1,9 @@
-
+# -*- coding: utf-8 -*-
 # Python script for preparing the output from DeterminePFL.py for analysis in PRISM
 # with the end goal of fitting the transcription termination data  
 # (Step 3 in the pipeline)
 #
 # - Requires Python 3 (has been tested with version 3.5)
-# - Public release 1.0
 # - Copyright 2018 Chad Torgerson
 
 ###################################################################################
@@ -38,12 +37,15 @@ try:
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     
     # File locations
-    folder = 'demos'
-    variantFile ="Cte_PFL-demo.csv"
+#    folder = 'demos'
+#    variantFile ="Cte_PFL-demo.csv"
+    folder = os.path.join("demos", "Bsu_data")
+    variantFile ="BsuR2-U87G_QST20_PFL_SinglesOnly.csv"
     variantPath = os.path.join(folder, variantFile)
     
     outputDirectory = 'output'
-    sampleName = "Cte_PFL-demo"
+#    sampleName = "Cte_PFL-demo"
+    sampleName = "BsuR2-U87G_QST20"
     outputFileName = os.path.join(outputDirectory, sampleName + "_prepped4PRISM.xlsx")
     
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
