@@ -5,12 +5,17 @@ fastq_file1=$2
 fastq_file2=$3
 file_base=$4
 
+#Adapter sequences listed below - input your own FWD_5 and REV3
+#REV_5 and FWD_3 should be from the adapter
+
 ADAPTER_FWD_5=^NNNNNNNNNNTATATGAGCATCGAAAGAA
 ADAPTER_FWD_3=CTGTAGGCACCATCAATC
 ADAPTER_REV_5=^NNNNNNNNNNGATTGATGGTGCCTACAG
 ADAPTER_REV_3=TTCTTTCGATGCTCATATA
 
-output_dir=/ysm-gpfs/pi/strobel/kmb242/Aax_SMARTT_210120/trimmed/final
+#Input your directory name here
+
+output_dir=/
 
 input1="$sample_dir"/"$fastq_file1"
 input2="$sample_dir"/"$fastq_file2"
