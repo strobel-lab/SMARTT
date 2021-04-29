@@ -121,16 +121,15 @@ try:
     fits_generated_with = 'R'  # Options: 'PRSIM' or 'R'
 
     # File locations
-    csvFolder = "/home/kmb242/project/Aax_SMARTT_210120/fitting/GenFits/"
-    svgFolder = "/home/kmb242/project/Aax_SMARTT_210120/fitting/GenFits/HeatMaps"
-    outFolder = "/home/kmb242/project/Aax_SMARTT_210120/fitting/GenFits/HeatMaps"
+    csvFolder = "demos"
+    svgFolder = "demos"
+    outFolder = "output"
     if fits_generated_with == 'PRISM':
-        csvFile = os.path.join(csvFolder, "Bsu_Fits_AllSingleMutations_PRISM.csv")
-        
+        csvFile = os.path.join(csvFolder, "Cte_Fits_AllSingleMutations_PRISM.csv")
     elif fits_generated_with == 'R':
-        csvFile = os.path.join(csvFolder, "210218-Aax_WT_cdG_5_Fits.csv")
-    svgFile = os.path.join(svgFolder, "Aax2Structure.svg")
-    outFile = os.path.join(outFolder, "210301-Aax_WT_cdG_" + parameter_type + '_' + value_type + ".svg")
+        csvFile = os.path.join(csvFolder, "Cte_Fits_AllSingleMutations_R.csv")
+    svgFile = os.path.join(svgFolder, "Cte_annotated.svg")
+    outFile = os.path.join(outFolder, "Cte_colored_" + parameter_type + '_' + value_type + ".svg")
     
     
     # Parameter identifiers (column/row titles) used in csv input file
