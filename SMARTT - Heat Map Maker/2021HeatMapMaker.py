@@ -469,7 +469,7 @@ try:
                     Colorfract = Linear_Change_Colorfract(SampleValue, cf_slope2, cf_intercept2)
                     fill_color = determine_rgb_linear(rgb_mid_color, rgb_high_color, Colorfract)                   
             elif parameter_type == 'K':
-                if heat_range2 == None or SampleValue <= heat_range[0]:
+                if heat_range2 == None or SampleValue >= heat_range[1]:
                     Colorfract = Linear_Change_Colorfract(SampleValue, cf_slope, cf_intercept)
                     fill_color = determine_rgb_linear(rgb_low_color, rgb_mid_color, Colorfract)
                 else:
