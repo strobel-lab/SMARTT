@@ -1,7 +1,8 @@
 
-# This script reads a csv file with %FL values for various glycine concentrations
+# This script reads a csv file with %FL values for various ligand concentrations
 # and fits the data to a modified binding equation for all variants. This is an
-# alternative to analyzing the data using PRISM.
+# alternative to analyzing the data using PRISM. This file also includes delta G
+# values in the output.
 #
 #
 # - Requires R (has been tested with version 3.4.4) and the minpack.lm package
